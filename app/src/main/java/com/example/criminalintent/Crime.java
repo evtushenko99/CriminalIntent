@@ -1,13 +1,30 @@
 package com.example.criminalintent;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+
+import java.text.DateFormat;
+import java.text.FieldPosition;
+import java.text.ParsePosition;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.UUID;
 
 public class Crime {
+    public static final String DATE_FORMAT_1 = "EEEE, MMM d , yyyy";
     private UUID mId;
     private String mTitle;
     private Date mDate;
     private Boolean mSolved;
+    private Boolean mRequiresPolice;
+
+    public Boolean getRequiresPolice() {
+        return mRequiresPolice;
+    }
+
+    public void setRequiresPolice(Boolean requiresPolice) {
+        mRequiresPolice = requiresPolice;
+    }
 
     public Crime(){
         mId = UUID.randomUUID();
@@ -41,5 +58,12 @@ public class Crime {
 
     public void setSolved(Boolean solved) {
         mSolved = solved;
+    }
+
+    @NonNull
+    @Override
+    public String toString() {
+        SimpleDateFormat mDateFormat = new SimpleDateFormat(DATE_FORMAT_1);
+        return mDateFormat.format(mDate);
     }
 }
