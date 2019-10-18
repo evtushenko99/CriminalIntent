@@ -1,11 +1,6 @@
 package com.example.criminalintent;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-
-import java.text.DateFormat;
-import java.text.FieldPosition;
-import java.text.ParsePosition;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.UUID;

@@ -6,10 +6,13 @@ import androidx.fragment.app.FragmentManager;
 
 import android.os.Bundle;
 
-public class CrimeActivity extends SingleFragmentActivity {
+import java.util.UUID;
 
+public class CrimeActivity extends SingleFragmentActivity {
+    private static final String EXTRA_UUID = "Crime_UUID";
     @Override
     protected Fragment createFragment() {
-        return new CrimeFragment();
+        UUID crimeID = (UUID) getIntent().getSerializableExtra(EXTRA_UUID);
+        return CrimeFragment.newInstance(crimeID);
     }
 }

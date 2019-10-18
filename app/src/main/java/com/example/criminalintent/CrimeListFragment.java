@@ -1,6 +1,7 @@
 package com.example.criminalintent;
 
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -13,16 +14,20 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.List;
 
 public class CrimeListFragment extends Fragment {
+    private static final int REQUEST_CRIME = 1;
+    private static final String EXTRA_UUID = "Crime_UUID";
     private RecyclerView mCrimeRecyclerView;
     private CrimeAdapter mCrimeAdapter;
     private final int CALLTHEPOLICEE = R.layout.list_item_crime_police;
     private final int REGULARFRAGMENT = R.layout.list_item_crime;
+    private int mLastUpdatedPosition = -1;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -41,11 +46,27 @@ public class CrimeListFragment extends Fragment {
         return v;
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        updateUI();
+    }
+
     private void updateUI() {
         CrimeLab crimeLab = CrimeLab.get(getActivity());
         List<Crime> crimes = crimeLab.getCrimes();
-        mCrimeAdapter = new CrimeAdapter((crimes));
-        mCrimeRecyclerView.setAdapter(mCrimeAdapter);
+        if (mCrimeAdapter == null) {
+            mCrimeAdapter = new CrimeAdapter(crimes);
+            mCrimeRecyclerView.setAdapter(mCrimeAdapter);
+        }else {
+            if (mLastUpdatedPosition > -1) {
+                mCrimeAdapter.notifyItemChanged(mLastUpdatedPosition);
+                mLastUpdatedPosition = -1;
+            } else {
+                mCrimeAdapter.notifyDataSetChanged();
+            }
+        }
+
     }
 
     private class CrimeHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
@@ -66,15 +87,28 @@ public class CrimeListFragment extends Fragment {
             mCrime = crime;
             mTittleTextView.setText(mCrime.getTitle());
             mDateTextView.setText(mCrime.toString());
-            mPhoneImageView.setVisibility(mCrime.getRequiresPolice()?View.VISIBLE: View.GONE);
+            mPhoneImageView.setVisibility(mCrime.getRequiresPolice() ? View.VISIBLE : View.GONE);
         }
 
         @Override
         public void onClick(View view) {
-            Toast.makeText(getActivity(), mCrime.getTitle() + "clicked", Toast.LENGTH_SHORT).show();
+            Intent intent = new Intent(getActivity(), CrimeActivity.class);
+            mLastUpdatedPosition = this.getAdapterPosition();
+            intent.putExtra(EXTRA_UUID, mCrime.getId());
+            startActivityForResult(intent, REQUEST_CRIME);
         }
     }
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if(resultCode != FragmentActivity.RESULT_OK) {
+            return;
+        }
+        if ( requestCode == REQUEST_CRIME){
 
+            return;
+        }
+    }
 
 
     private class CrimeAdapter extends RecyclerView.Adapter<CrimeHolder> {
@@ -95,7 +129,7 @@ public class CrimeListFragment extends Fragment {
         public CrimeHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
             LayoutInflater inflater = LayoutInflater.from(getActivity());
 
-                    return new CrimeHolder(inflater, parent);
+            return new CrimeHolder(inflater, parent);
 
 
         }
